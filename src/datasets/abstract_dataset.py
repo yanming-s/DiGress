@@ -36,12 +36,9 @@ class AbstractDataModule(LightningDataset):
         for data in self.train_dataloader():
             num_classes = data.x.shape[1]
             break
-
         counts = torch.zeros(num_classes)
-
         for i, data in enumerate(self.train_dataloader()):
             counts += data.x.sum(dim=0)
-
         counts = counts / counts.sum()
         return counts
 
@@ -50,24 +47,18 @@ class AbstractDataModule(LightningDataset):
         for data in self.train_dataloader():
             num_classes = data.edge_attr.shape[1]
             break
-
         d = torch.zeros(num_classes, dtype=torch.float)
-
         for i, data in enumerate(self.train_dataloader()):
             unique, counts = torch.unique(data.batch, return_counts=True)
-
             all_pairs = 0
             for count in counts:
                 all_pairs += count * (count - 1)
-
             num_edges = data.edge_index.shape[1]
             num_non_edges = all_pairs - num_edges
-
             edge_types = data.edge_attr.sum(dim=0)
             assert num_non_edges >= 0
             d[0] += num_non_edges
             d[1:] += edge_types[1:]
-
         d = d / d.sum()
         return d
 
@@ -75,10 +66,8 @@ class AbstractDataModule(LightningDataset):
 class MolecularDataModule(AbstractDataModule):
     def valency_count(self, max_n_nodes):
         valencies = torch.zeros(3 * max_n_nodes - 2)   # Max valency possible if everything is connected
-
         # No bond, single bond, double bond, triple bond, aromatic bond
         multiplier = torch.tensor([0, 1, 2, 3, 1.5])
-
         for data in self.train_dataloader():
             n = data.x.shape[0]
 

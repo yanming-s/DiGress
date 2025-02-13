@@ -130,7 +130,7 @@ class DiscreteDenoisingDiffusion(pl.LightningModule):
             utils.setup_wandb(self.cfg)
 
     def on_train_epoch_start(self) -> None:
-        self.print("Starting train epoch...")
+        self.print(f"\nStarting train epoch {self.current_epoch}")
         self.start_epoch_time = time.time()
         self.train_loss.reset()
         self.train_metrics.reset()
@@ -140,13 +140,13 @@ class DiscreteDenoisingDiffusion(pl.LightningModule):
         self.print(f"Epoch {self.current_epoch}: X_CE: {to_log['train_epoch/x_CE'] :.3f}"
                       f" -- E_CE: {to_log['train_epoch/E_CE'] :.3f} --"
                       f" y_CE: {to_log['train_epoch/y_CE'] :.3f}"
-                      f" -- {time.time() - self.start_epoch_time:.1f}s ")
+                      f" -- {(time.time() - self.start_epoch_time) / 60:.2f}min ")
         epoch_at_metrics, epoch_bond_metrics = self.train_metrics.log_epoch_metrics()
         self.print(f"Epoch {self.current_epoch}: {epoch_at_metrics} -- {epoch_bond_metrics}")
-        if torch.cuda.is_available():
-            print(torch.cuda.memory_summary())
-        else:
-            print("CUDA is not available. Skipping memory summary.")
+        # if torch.cuda.is_available():
+        #     print(torch.cuda.memory_summary())
+        # else:
+        #     print("CUDA is not available. Skipping memory summary.")
 
     def on_validation_epoch_start(self) -> None:
         self.val_nll.reset()

@@ -99,7 +99,7 @@ def main(cfg: DictConfig):
                         'sampling_metrics': sampling_metrics, 'visualization_tools': visualization_tools,
                         'extra_features': extra_features, 'domain_features': domain_features}
 
-    elif dataset_config["name"] in ['qm9', 'guacamol', 'moses']:
+    elif dataset_config["name"] in ['qm9', 'guacamol', 'moses', 'zinc']:
         from metrics.molecular_metrics import TrainMolecularMetrics, SamplingMolecularMetrics
         from metrics.molecular_metrics_discrete import TrainMolecularMetricsDiscrete
         from diffusion.extra_features_molecular import ExtraMolecularFeatures
@@ -122,6 +122,13 @@ def main(cfg: DictConfig):
             datamodule = moses_dataset.MosesDataModule(cfg)
             dataset_infos = moses_dataset.MOSESinfos(datamodule, cfg)
             train_smiles = None
+        
+        elif dataset_config.name == 'zinc':
+            from datasets import zinc_dataset
+            datamodule = zinc_dataset.ZincDataModule(cfg)
+            dataset_infos = zinc_dataset.Zincinfos(datamodule)
+            train_smiles = None
+
         else:
             raise ValueError("Dataset not implemented")
 
@@ -190,7 +197,7 @@ def main(cfg: DictConfig):
     trainer = Trainer(gradient_clip_val=cfg.train.clip_grad,
                       strategy="ddp_find_unused_parameters_true",  # Needed to load old checkpoints
                       accelerator='gpu' if use_gpu else 'cpu',
-                      devices=cfg.general.gpus if use_gpu else 1,
+                      devices=cfg.general.gpus if use_gpu else [1],
                       max_epochs=cfg.train.n_epochs,
                       check_val_every_n_epoch=cfg.general.check_val_every_n_epochs,
                       fast_dev_run=cfg.general.name == 'debug',

@@ -1,0 +1,4 @@
+name: 'zinc'
+datadir: 'data/zinc/'
+remove_h: null
+filter: False

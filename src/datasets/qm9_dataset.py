@@ -116,9 +116,12 @@ class QM9Dataset(InMemoryDataset):
         dataset = pd.read_csv(self.raw_paths[1])
 
         n_samples = len(dataset)
-        n_train = 100000
-        n_test = int(0.1 * n_samples)
-        n_val = n_samples - (n_train + n_test)
+        # n_train = 100000
+        # n_test = int(0.1 * n_samples)
+        # n_val = n_samples - (n_train + n_test)
+        n_train = 2000
+        n_test = 200
+        n_val = 200
 
         # Shuffle dataset with df.sample, then split
         train, val, test = np.split(dataset.sample(frac=1, random_state=42), [n_train, n_val + n_train])
