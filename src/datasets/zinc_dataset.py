@@ -29,7 +29,7 @@ def to_list(value: Any) -> Sequence:
         return [value]
 
 
-atom_decoder = ['C', 'N', 'O', 'F', 'B', 'Br', 'Cl', 'I', 'P', 'S', 'Se']
+atom_decoder = ['C', 'N', 'O', 'F', 'B', 'Br', 'Cl', 'I', 'P', 'S', 'Se', 'Si']
 
 
 class ZincDataset(InMemoryDataset):
@@ -80,9 +80,9 @@ class ZincDataset(InMemoryDataset):
         
         dataset = pd.read_csv(osp.join(self.raw_dir, self.raw_file_names[0]))
 
-        n_train = 5000
-        n_val = 200
-        n_test = 200
+        n_train = 25000
+        n_val = 2000
+        n_test = 2000
 
         train, val, test, _ = np.split(dataset.sample(frac=1, random_state=0), [n_train, n_val + n_train, n_val + n_train + n_test])
         train.to_csv(os.path.join(self.raw_dir, 'train_zinc.csv'))
@@ -163,13 +163,11 @@ class ZincDataset(InMemoryDataset):
         # Save the smiles strings for the train split
         if self.filter_dataset:
             smiles_save_path = osp.join(pathlib.Path(self.raw_paths[0]).parent, f'{self.stage}.smiles')
-            with open(smiles_save_path, 'w') as f:
-                f.writelines([f"{smile}\n" for smile in smiles_kept])
+            np.save(smiles_save_path, np.array(smiles_kept))
             print(f"Number of molecules kept: {len(smiles_kept)} / {len(smiles_list)}")
         else:
             smiles_save_path = osp.join(pathlib.Path(self.raw_paths[0]).parent, f'{self.stage}.smiles')
-            with open(smiles_save_path, 'w') as f:
-                f.writelines([f"{smile}\n" for smile in smiles_list])
+            np.save(smiles_save_path, np.array(smiles_list))
 
 
 class ZincDataModule(MolecularDataModule):
@@ -205,27 +203,29 @@ class Zincinfos(AbstractDatasetInfos):
         self.num_atom_types = len(self.atom_encoder)
         self.atom_weights = {
             0: 12, 1: 14, 2: 16, 3: 19, 4: 10.81, 5: 79.9,
-            6: 35.45, 7: 126.9, 8: 30.97, 9: 30.07, 10: 78.97
+            6: 35.45, 7: 126.9, 8: 30.97, 9: 30.07, 10: 78.97, 11: 28.09
         }
-        self.valencies = [4, 3, 2, 1, 3, 1, 1, 1, 3, 2, 2]
-        self.max_weight = 337.45
+        self.max_weight = 349.91
+        self.valencies = [4, 3, 2, 1, 3, 1, 1, 1, 3, 2, 2, 4]
         self.n_nodes = torch.tensor(
             [
-                0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
-                0.0000, 0.0000, 0.0000, 0.0000, 0.0002, 0.0000, 0.0002, 0.0035, 0.0125,
-                0.0456, 0.0783, 0.1090, 0.1440, 0.1635, 0.1798, 0.1550, 0.1050, 0.0035
+                0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00,
+                0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00,
+                0.0000e+00, 5.8824e-05, 1.7647e-04, 7.6471e-04, 3.0588e-03, 1.2882e-02,
+                4.5118e-02, 7.9765e-02, 1.0871e-01, 1.3894e-01, 1.6088e-01, 1.8771e-01,
+                1.4718e-01, 1.1165e-01, 3.1176e-03
             ]
         )
         self.node_types = torch.tensor(
             [
-                7.0119e-01, 1.5721e-01, 1.1981e-01, 1.0107e-02, 0.0000e+00, 3.7366e-04,
-                2.5245e-03, 0.0000e+00, 9.1137e-06, 8.7765e-03, 0.0000e+00
+                6.9992e-01, 1.5766e-01, 1.1976e-01, 1.0817e-02, 3.0361e-06, 3.9772e-04,
+                2.5533e-03, 6.0721e-06, 1.5180e-05, 8.8562e-03, 0.0000e+00, 3.0361e-06
             ]
         )
-        self.edge_types = torch.tensor([8.9952e-01, 6.6878e-02, 7.7740e-03, 3.0092e-04, 2.5532e-02])
+        self.edge_types = torch.tensor([8.9952e-01, 6.6496e-02, 7.7541e-03, 2.9075e-04, 2.5936e-02])
         self.max_n_nodes = len(self.n_nodes) - 1
         self.valency_distribution = torch.zeros(3 * self.max_n_nodes - 2)
-        self.valency_distribution[:7] = torch.tensor([0.0000, 0.1199, 0.3946, 0.2917, 0.1888, 0.0017, 0.0033])
+        self.valency_distribution[:7] = torch.tensor([0.0000, 0.1191, 0.3916, 0.2949, 0.1892, 0.0018, 0.0034])
 
         if recompute_statistics:
             self.n_nodes = datamodule.node_counts()
@@ -237,11 +237,11 @@ class Zincinfos(AbstractDatasetInfos):
             self.edge_types = datamodule.edge_counts()
             print("Distribution of edge types", self.edge_types)
             np.savetxt('zinc_edge_types.txt', self.edge_types.numpy())
+            self.max_n_nodes = len(self.n_nodes) - 1
             valencies = datamodule.valency_count(self.max_n_nodes)
             print("Distribution of valencies", valencies)
             np.savetxt('zinc_valencies.txt', valencies.numpy())
-            self.valency_distribution = valencies
-        
+            self.valency_distribution = valencies        
         super().complete_infos(n_nodes=self.n_nodes, node_types=self.node_types)
 
 

@@ -119,12 +119,12 @@ class QM9Dataset(InMemoryDataset):
         # n_train = 100000
         # n_test = int(0.1 * n_samples)
         # n_val = n_samples - (n_train + n_test)
-        n_train = 2000
-        n_test = 200
-        n_val = 200
+        n_train = 10000
+        n_val = 2000
+        n_test = 2000
 
         # Shuffle dataset with df.sample, then split
-        train, val, test = np.split(dataset.sample(frac=1, random_state=42), [n_train, n_val + n_train])
+        train, val, test, _ = np.split(dataset.sample(frac=1, random_state=42), [n_train, n_train + n_val, n_train + n_val + n_test])
 
         train.to_csv(os.path.join(self.raw_dir, 'train.csv'))
         val.to_csv(os.path.join(self.raw_dir, 'val.csv'))

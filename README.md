@@ -19,7 +19,9 @@ Compared to the original repository, we added the ZINC dataset extension. The `D
 
 ### Generation on QM9 Dataset
 
-Generation results with the DiGress model on a subset of the QM9 dataset (2000 training samples, 200 testing samples) with batch size 512. Models are trained for 500 epochs, generating 1000 samples to evaluate validity, uniqueness, and novelty. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
+#### Generation with Small Training Set
+
+Generation results with the DiGress model on a subset of the QM9 dataset ($2,000$ training samples, $200$ testing samples) with batch size $512$. Models are trained for $500$ epochs, generating $1,000$ samples to evaluate validity, uniqueness, and novelty. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
 
 |     Network      | Test Loss | Valid | Unique | Novelty |
 | :--------------: | :---------------: | :--------: | :--------------: | :--------------: |
@@ -31,9 +33,25 @@ Generation results with the DiGress model on a subset of the QM9 dataset (2000 t
 |   GTv2-FiLM   | 143.8812 | **83.40%** | **100.00%** | 99.52% |
 
 
+#### Generation with Medium Training Set
+
+Generation results with the DiGress model on a subset of the QM9 dataset ($10,000$ training samples, $2,000$ testing samples) with batch size $512$. Models are trained for $1000$ epochs, generating $1000$ samples to evaluate relaxed validity, uniqueness, and novelty. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
+
+|     Network      | Test Loss | Relaxed Validity | Uniqueness | Novelty |
+| :--------------: | :---------------: | :--------: | :--------------: | :--------------: |
+| *DiGress* | *130.8862* |     *95.20%*     |  *99.79%*  | *97.16%* |
+| GTv1 |  **133.7329**  |      **91.70%**      |   99.67%   |  97.48%  |
+| GTv2-Weighted | 142.8142 | 89.20% | **99.78%** | 96.29% |
+|  GTv2-Gated  | 136.5060 | 85.90% | 99.53% | 97.43% |
+|  GTv2-Mixed  |  135.9933  |      81.80%      |   99.51%   |  97.30%  |
+|   GTv2-FiLM   |  134.5235  |      88.00%      |   99.66%   |  **97.95%**  |
+
+
 ### Generation on ZINC Dataset
 
-Generation results with the DiGress model on a subset of the ZINC dataset (5000 training samples, 200 testing samples) with batch size 512. Models are trained for 1000 epochs, generating 1000 samples to evaluate validity and uniqueness. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
+#### Generation with Small Training Set
+
+Generation results with the DiGress model on a subset of the ZINC dataset ($5,000$ training samples, $200$ testing samples) with batch size $512$. Models are trained for $1,000$ epochs, generating $1,000$ samples to evaluate validity and uniqueness. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
 
 |     Network      | Test Loss | Valid | Unique |
 | :--------------: | :---------------: | :--------: | :--------------: |
@@ -43,6 +61,20 @@ Generation results with the DiGress model on a subset of the ZINC dataset (5000 
 |  GTv2-Gated  | 271.0986 | 58.40% | 100.00% |
 |  GTv2-Mixed  | **240.4660** | 52.50% | 100.00% |
 |   GTv2-FiLM   | 260.0413 | **60.60%** | 100.00% |
+
+
+#### Generation with Large Traning Set
+
+Generation results with the DiGress model on a subset of the ZINC dataset ($25,000$ training samples, $2,000$ testing samples) with batch size $512$. Models are trained for $1,000$ epochs, generating $1,000$ samples to evaluate validity, relaxed validity, and uniqueness. The GTv2-Weighted model uses hyperparameter $\alpha = 0.5$.
+
+|     Network      | Test Loss | Relaxed Validity | Uniqueness |
+| :--------------: | :---------------: | :--------------: | :--------------: |
+| *DiGress* | *229.7168* |     *74.80%*     |  *100.0%*  |
+| GTv1 |  **227.7060**  |      70.20%      |   100.0%   |
+| GTv2-Weighted |  242.6883  |      70.50%      |   100.0%   |
+|  GTv2-Gated  | 229.1552 | 64.50% | 100.0% |
+|  GTv2-Mixed  | 239.0610 | **73.10%** | 100.0% |
+|   GTv2-FiLM   |  234.9281  |      72.50%      |   100.0%   | 
 
 
 ## References
