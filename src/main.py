@@ -132,12 +132,15 @@ def main(cfg: DictConfig):
         else:
             raise ValueError("Dataset not implemented")
 
-        if cfg.model.type == 'discrete' and cfg.model.extra_features is not None:
-            extra_features = ExtraFeatures(cfg.model.extra_features, dataset_info=dataset_infos)
-            domain_features = ExtraMolecularFeatures(dataset_infos=dataset_infos)
-        else:
-            extra_features = DummyExtraFeatures()
-            domain_features = DummyExtraFeatures()
+        # if cfg.model.type == 'discrete' and cfg.model.extra_features is not None:
+        #     extra_features = ExtraFeatures(cfg.model.extra_features, dataset_info=dataset_infos)
+        #     domain_features = ExtraMolecularFeatures(dataset_infos=dataset_infos)
+        # else:
+        #     extra_features = DummyExtraFeatures()
+        #     domain_features = DummyExtraFeatures()
+
+        extra_features = DummyExtraFeatures()
+        domain_features = DummyExtraFeatures()
 
         dataset_infos.compute_input_output_dims(datamodule=datamodule, extra_features=extra_features,
                                                 domain_features=domain_features)
@@ -199,7 +202,7 @@ def main(cfg: DictConfig):
         strategy="ddp_find_unused_parameters_true",  # Needed to load old checkpoints
         accelerator='gpu' if use_gpu else 'cpu',
         # devices=cfg.general.gpus if use_gpu else 1,
-        devices=[6],
+        devices=[7],
         max_epochs=cfg.train.n_epochs,
         check_val_every_n_epoch=cfg.general.check_val_every_n_epochs,
         fast_dev_run=cfg.general.name == 'debug',
