@@ -202,7 +202,7 @@ def main(cfg: DictConfig):
         strategy="ddp_find_unused_parameters_true",  # Needed to load old checkpoints
         accelerator='gpu' if use_gpu else 'cpu',
         # devices=cfg.general.gpus if use_gpu else 1,
-        devices=[7],
+        devices=[0],
         max_epochs=cfg.train.n_epochs,
         check_val_every_n_epoch=cfg.general.check_val_every_n_epochs,
         fast_dev_run=cfg.general.name == 'debug',
